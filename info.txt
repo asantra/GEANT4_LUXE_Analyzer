@@ -1,0 +1,9 @@
+Simple example macros to rpocess LUXE Geant4 output root files.  
+Very old versions of root might not work, tested with 6.16, 6.20, 6.22.
+
+For Tracks tree:
+root -l process_track_tree_draw_v2.C'("f_list.txt")'
+
+For Hits tree:
+root -l process_hits_tree_draw_v2.C'("f_list.txt")'
+

@@ -1,0 +1,2 @@
+simdata/lx_bckg_afs_run_8.root
+simdata/lx_bckg_afs_run_10.root
