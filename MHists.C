@@ -693,6 +693,34 @@ void MHists::SetMarkerSize(const std::string hmapid, const Double_t msize)
 }
 
 
+void MHists::Scale(const std::string hmapid, const Double_t x)
+{
+  if (fhist_map.find(hmapid) != fhist_map.end()) {
+    for (std::vector <TH1*>::iterator itr = fhist_map[hmapid].begin(); itr != fhist_map[hmapid].end(); ++itr) {
+      TH1 *hh = dynamic_cast<TH1*>(*itr);
+      if (!hh) continue;
+      hh->Scale(x);
+    }
+  }
+}
+
+
+int MHists::SetLog (TCanvas *cc, const int axis)
+{
+  TPad *pp;
+  if (!cc) return 0;
+  int nn = 1;
+  while ( pp = dynamic_cast<TPad*>(cc->GetPad(nn)) ) {
+    switch (axis) {
+      case 0 : pp->SetLogx(); break;
+      case 1 : pp->SetLogy(); break;
+      case 2 : pp->SetLogz(); break;
+    }
+    ++nn;
+  }
+  return nn;
+}
+
 
 Int_t MHist_test_v1(const Int_t n_hist = 4)
 {

@@ -11,7 +11,6 @@
  #include <string>
  #include <vector>
  #include <map>
- #include <stdexcept>
 
  #include <Rtypes.h>
  
@@ -58,6 +57,8 @@ public:
   void SetLineColor(const std::string hmapid, const Int_t clr = 0);
   void SetLineWidth(const std::string hmapid, const Int_t wdth = 1);
   void SetMarkerSize(const std::string hmapid, const Double_t msize = 1.0);
+  void Scale(const std::string hmapid, const Double_t x);
+  static int SetLog (TCanvas *cc, const int axis = 1);
 
   Int_t SaveHists (const std::string &fname);
   Int_t SaveHists (const std::vector<std::string> hmapids, const std::string &fname);
