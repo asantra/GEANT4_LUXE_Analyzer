@@ -4,11 +4,11 @@
 
 #ifndef __RUN_PROC_TREE__
 
-void process_track_tree_draw_v3(const char *fnlist = 0, const char *commentstr = 0)
+void process_track_tree_draw_v6(const char *fnlist = 0, const char *commentstr = 0)
 {
    gROOT->ProcessLineSync("#define __RUN_PROC_TREE__ 1");
    gROOT->ProcessLineSync(".L MHists.C+");
-   gROOT->ProcessLine("#include \"process_track_tree_draw_v3.C\"");
+   gROOT->ProcessLine("#include \"process_track_tree_draw_v6.C\"");
    gROOT->ProcessLine(fnlist ? Form("run_process_track_tree_draw(\"%s\")", fnlist) : "run_process_track_tree_draw(0)");
    gROOT->ProcessLine("#undef __RUN_PROC_TREE__");
 }
@@ -47,7 +47,7 @@ int run_process_track_tree_draw(const char *fnlist = 0, const char *commentstr =
   int debugl = 0; //1;
 
   if (!fnlist) {
-    std::cout << "Usage: root -l process_track_tree_draw_v3.C\'(\"file_with_list_of_mc_files\")\'\n";
+    std::cout << "Usage: root -l process_track_tree_draw_v5.C\'(\"file_with_list_of_mc_files\")\'\n";
     return -1;
   }
   
@@ -165,9 +165,9 @@ int run_process_track_tree_draw(const char *fnlist = 0, const char *commentstr =
       }
     }
     if(debugl)std::cout << "After getting primary particle energies" << std::endl;
-    if (primary_pdg == -99) {
-      std::cout << "WARNING! Primary is not found in event " << ev_id << std::endl;
-    }
+//     if (primary_pdg == -99) {
+//       std::cout << "WARNING! Primary is not found in event " << ev_id << std::endl;
+//     }
 
   for (size_t ii = 0; ii < ntrck; ++ii) {
     int det_id, pdg, track_id;
@@ -220,6 +220,29 @@ int run_process_track_tree_draw(const char *fnlist = 0, const char *commentstr =
       lhist->FillHistW("tracking_planes_vtxx_vtxy", det, vtx_x, vtx_y, ev_weight);
       if (pdg == 11)  {
 //         multiplicityEle[bxNumber][det]++;
+        lhist->FillHistW("tracking_planes_track_x_electrons", det, xx, ev_weight);
+        lhist->FillHistW("tracking_planes_track_y_electrons", det, yy, ev_weight);
+        lhist->FillHistW("tracking_planes_track_e_electrons", det, eneg, ev_weight);
+        lhist->FillHistW("tracking_planes_vtx_z_track_e_electrons", det, vtx_z, eneg, ev_weight);
+        lhist->FillHistW("tracking_planes_vtx_x_track_e_electrons", det, vtx_x, eneg, ev_weight);
+        //lhist->FillHistW("tracking_planes_vtx_x_vtx_z_track_e_electrons", det, vtx_x, vtx_z, eneg, ev_weight);
+        if(eneg<=1.0){
+            lhist->FillHistW("tracking_planes_track_e_electrons_zoomed", det, eneg, ev_weight);
+            lhist->FillHistW("tracking_planes_vtx_z_track_e_electrons_zoomed", det, vtx_z, eneg, ev_weight);
+            lhist->FillHistW("tracking_planes_vtx_x_track_e_electrons_zoomed", det, vtx_x, eneg, ev_weight);
+            //lhist->FillHistW("tracking_planes_vtx_x_vtx_z_track_e_electrons_zoomed", det, vtx_x, vtx_z, eneg, ev_weight);
+        }
+        if(eneg<=0.05){
+            lhist->FillHistW("tracking_planes_track_e_electrons_morezoomed", det, eneg, ev_weight);
+            lhist->FillHistW("tracking_planes_vtx_z_track_e_electrons_morezoomed", det, vtx_z, eneg, ev_weight);
+            lhist->FillHistW("tracking_planes_vtx_x_track_e_electrons_morezoomed", det, vtx_x, eneg, ev_weight);
+            //lhist->FillHistW("tracking_planes_vtx_x_vtx_z_track_e_electrons_morezoomed", det, vtx_x, vtx_z, eneg, ev_weight);
+        }
+        lhist->FillHistW("tracking_planes_vtx_z_electrons", det, vtx_z, ev_weight);
+        lhist->FillHistW("tracking_planes_track_xy_electrons", det, xx, yy, ev_weight);
+        lhist->FillHistW("tracking_planes_vtxz_vtxx_electrons", det, vtx_z, vtx_x, ev_weight);
+        lhist->FillHistW("tracking_planes_vtxz_vtxy_electrons", det, vtx_z, vtx_y, ev_weight);
+        lhist->FillHistW("tracking_planes_vtxx_vtxy_electrons", det, vtx_x, vtx_y, ev_weight);
         if(track_id==1){
             //multiplicitySignalEle[bxNumber][det]++;
             lhist->FillHistW("tracking_planes_signal_track_x_electrons", det, xx, ev_weight);
@@ -276,6 +299,29 @@ int run_process_track_tree_draw(const char *fnlist = 0, const char *commentstr =
       
       if (pdg == -11)  {
 //         multiplicityPos[bxNumber][det]++;
+        lhist->FillHistW("tracking_planes_track_x_positrons", det, xx, ev_weight);
+        lhist->FillHistW("tracking_planes_track_y_positrons", det, yy, ev_weight);
+        lhist->FillHistW("tracking_planes_track_e_positrons", det, eneg, ev_weight); 
+        lhist->FillHistW("tracking_planes_vtx_z_track_e_positrons", det, vtx_z, eneg, ev_weight);
+        lhist->FillHistW("tracking_planes_vtx_x_track_e_positrons", det, vtx_x, eneg, ev_weight);
+        //lhist->FillHistW("tracking_planes_vtx_x_vtx_z_track_e_positrons", det, vtx_x, vtx_z, eneg, ev_weight);
+        if(eneg<=1.0){
+            lhist->FillHistW("tracking_planes_track_e_positrons_zoomed", det, eneg, ev_weight);
+            lhist->FillHistW("tracking_planes_vtx_z_track_e_positrons_zoomed", det, vtx_z, eneg, ev_weight);
+            lhist->FillHistW("tracking_planes_vtx_x_track_e_positrons_zoomed", det, vtx_x, eneg, ev_weight);
+            //lhist->FillHistW("tracking_planes_vtx_x_vtx_z_track_e_positrons_zoomed", det, vtx_x, vtx_z, eneg, ev_weight);
+        }
+        if(eneg<=0.05){
+            lhist->FillHistW("tracking_planes_track_e_positrons_morezoomed", det, eneg, ev_weight);
+            lhist->FillHistW("tracking_planes_vtx_z_track_e_positrons_morezoomed", det, vtx_z, eneg, ev_weight);
+            lhist->FillHistW("tracking_planes_vtx_x_track_e_positrons_morezoomed", det, vtx_x, eneg, ev_weight);
+            //lhist->FillHistW("tracking_planes_vtx_x_vtx_z_track_e_positrons_morezoomed", det, vtx_x, vtx_z, eneg, ev_weight);
+        }
+        lhist->FillHistW("tracking_planes_vtx_z_positrons", det, vtx_z, ev_weight);
+        lhist->FillHistW("tracking_planes_track_xy_positrons", det, xx, yy, ev_weight);
+        lhist->FillHistW("tracking_planes_vtxz_vtxx_positrons", det, vtx_z, vtx_x, ev_weight);
+        lhist->FillHistW("tracking_planes_vtxz_vtxy_positrons", det, vtx_z, vtx_y, ev_weight);
+        lhist->FillHistW("tracking_planes_vtxx_vtxy_positrons", det, vtx_x, vtx_y, ev_weight);
         if(track_id==1){
             //multiplicitySignalPos[bxNumber][det]++;
             lhist->FillHistW("tracking_planes_signal_track_x_positrons", det, xx, ev_weight);
@@ -331,6 +377,29 @@ int run_process_track_tree_draw(const char *fnlist = 0, const char *commentstr =
       }
       if (pdg == 22)  {
 //         multiplicityGam[bxNumber][det]++;
+        lhist->FillHistW("tracking_planes_track_x_gamma", det, xx, ev_weight);
+        lhist->FillHistW("tracking_planes_track_y_gamma", det, yy, ev_weight);
+        lhist->FillHistW("tracking_planes_track_e_gamma", det, eneg, ev_weight); 
+        lhist->FillHistW("tracking_planes_vtx_z_track_e_gamma", det, vtx_z, eneg, ev_weight);
+        lhist->FillHistW("tracking_planes_vtx_x_track_e_gamma", det, vtx_x, eneg, ev_weight);
+        //lhist->FillHistW("tracking_planes_vtx_x_vtx_z_track_e_gamma", det, vtx_x, vtx_z, eneg, ev_weight);
+        if(eneg<=1.0){
+            lhist->FillHistW("tracking_planes_track_e_gamma_zoomed", det, eneg, ev_weight);
+            lhist->FillHistW("tracking_planes_vtx_z_track_e_gamma_zoomed", det, vtx_z, eneg, ev_weight);
+            lhist->FillHistW("tracking_planes_vtx_x_track_e_gamma_zoomed", det, vtx_x, eneg, ev_weight);
+            //lhist->FillHistW("tracking_planes_vtx_x_vtx_z_track_e_gamma_zoomed", det, vtx_x, vtx_z, eneg, ev_weight);
+        }
+        if(eneg<=0.05){
+            lhist->FillHistW("tracking_planes_track_e_gamma_morezoomed", det, eneg, ev_weight);
+            lhist->FillHistW("tracking_planes_vtx_z_track_e_gamma_morezoomed", det, vtx_z, eneg, ev_weight);
+            lhist->FillHistW("tracking_planes_vtx_x_track_e_gamma_morezoomed", det, vtx_x, eneg, ev_weight);
+            //lhist->FillHistW("tracking_planes_vtx_x_vtx_z_track_e_gamma_morezoomed", det, vtx_x, vtx_z, eneg, ev_weight);
+        }
+        lhist->FillHistW("tracking_planes_vtx_z_gamma", det, vtx_z, ev_weight);
+        lhist->FillHistW("tracking_planes_track_xy_gamma", det, xx, yy, ev_weight);
+        lhist->FillHistW("tracking_planes_vtxz_vtxx_gamma", det, vtx_z, vtx_x, ev_weight);
+        lhist->FillHistW("tracking_planes_vtxz_vtxy_gamma", det, vtx_z, vtx_y, ev_weight);
+        lhist->FillHistW("tracking_planes_vtxx_vtxy_gamma", det, vtx_x, vtx_y, ev_weight);
         if(track_id==1){
             //multiplicitySignalGam[bxNumber][det]++;
             lhist->FillHistW("tracking_planes_signal_track_x_gamma", det, xx, ev_weight);
@@ -385,18 +454,211 @@ int run_process_track_tree_draw(const char *fnlist = 0, const char *commentstr =
         }
       }
     }
+    /*
+    double ecal_ytop = 26.5;
+    double ecal_ybot = -26.5;
+    double ecal_zfrnt = 4260.0;
+    double ecal_zback = 4345.0;
+    double ecal_xleft = 578.5;
+    double ecal_xrght = -578.5;
+    double ecal_xinleft = 30.5;
+    double ecal_xinrght = -30.5;
+    if (det_id >= 2000 && det_id <= 2001) {
+      int det = det_id - 2000;
+      lhist->FillHistW("ecal_track_x", det, xx, ev_weight);
+      lhist->FillHistW("ecal_track_y", det, yy, ev_weight);
+      lhist->FillHistW("ecal_track_vtx_z", det, vtx_z, ev_weight);
+      lhist->FillHistW("ecal_track_xy", det, xx, yy, ev_weight);
+      lhist->FillHistW("ecal_track_vtxz_vtxx", det, vtx_z, vtx_x, ev_weight);
+      lhist->FillHistW("ecal_track_vtxz_vtxy", det, vtx_z, vtx_y, ev_weight);
+      lhist->FillHistW("ecal_track_vtxx_vtxy", det, vtx_x, vtx_y, ev_weight);
+      if (zz > ecal_zfrnt && zz < ecal_zback) {
+        if (yy > ecal_ytop) {
+          lhist->FillHistW("ecal_track_vtxz_vtxx_top", det, vtx_z, vtx_x, ev_weight);
+          lhist->FillHistW("ecal_track_vtxz_vtxy_top", det, vtx_z, vtx_y, ev_weight);
+          lhist->FillHistW("ecal_track_vtxx_vtxy_top", det, vtx_x, vtx_y, ev_weight);
+          lhist->FillHistW("ecal_track_zx_top", det, zz, xx, ev_weight);
+          lhist->FillHistW("ecal_track_e_top", det, eneg, ev_weight);
+        }
+        if (yy < ecal_ybot) {
+          lhist->FillHistW("ecal_track_vtxz_vtxx_bottom", det, vtx_z, vtx_x, ev_weight);
+          lhist->FillHistW("ecal_track_vtxz_vtxy_bottom", det, vtx_z, vtx_y, ev_weight);
+          lhist->FillHistW("ecal_track_vtxx_vtxy_bottom", det, vtx_x, vtx_y, ev_weight);
+          lhist->FillHistW("ecal_track_zx_bottom", det, zz, xx, ev_weight);
+          lhist->FillHistW("ecal_track_e_bottom", det, eneg, ev_weight);
+        }
+        if (xx > ecal_xleft) {
+          lhist->FillHistW("ecal_track_vtxz_vtxx_left", det, vtx_z, vtx_x, ev_weight);
+          lhist->FillHistW("ecal_track_vtxz_vtxy_left", det, vtx_z, vtx_y, ev_weight);
+          lhist->FillHistW("ecal_track_vtxx_vtxy_left", det, vtx_x, vtx_y, ev_weight);
+          lhist->FillHistW("ecal_track_zy_left", det, zz, yy, ev_weight);
+          lhist->FillHistW("ecal_track_e_left", det, eneg, ev_weight);
+        }
+        if (xx < ecal_xrght) {
+          lhist->FillHistW("ecal_track_vtxz_vtxx_right", det, vtx_z, vtx_x, ev_weight);
+          lhist->FillHistW("ecal_track_vtxz_vtxy_right", det, vtx_z, vtx_y, ev_weight);
+          lhist->FillHistW("ecal_track_vtxx_vtxy_right", det, vtx_x, vtx_y, ev_weight);
+          lhist->FillHistW("ecal_track_zy_right", det, zz, yy, ev_weight);
+          lhist->FillHistW("ecal_track_e_right", det, eneg, ev_weight);
+        }
+        if (xx > ecal_xinrght && xx < ecal_xinleft) {
+          lhist->FillHistW("ecal_track_vtxz_vtxx_inner", det, vtx_z, vtx_x, ev_weight);
+          lhist->FillHistW("ecal_track_vtxz_vtxy_inner", det, vtx_z, vtx_y, ev_weight);
+          lhist->FillHistW("ecal_track_vtxx_vtxy_inner", det, vtx_x, vtx_y, ev_weight);
+          lhist->FillHistW("ecal_track_zy_inner", det, zz, yy, ev_weight);
+          lhist->FillHistW("ecal_track_e_inner", det, eneg, ev_weight);
+        }
+        lhist->FillHistW("ecal_track_vtxx_vtxy_zcut", det, vtx_x, vtx_y, ev_weight);
+        lhist->FillHistW("ecal_track_vtxz_vtxx_zcut", det, vtx_z, vtx_x, ev_weight);
+        lhist->FillHistW("ecal_track_vtxz_vtxy_zcut", det, vtx_z, vtx_y, ev_weight);
+        lhist->FillHistW("ecal_track_pdg_zcut", det, pdg, ev_weight);
+        lhist->FillHistW("ecal_track_e_zcut", det, eneg, ev_weight);
+      }
+      
+      if (zz < ecal_zfrnt) {
+        lhist->FillHistW("ecal_track_vtxx_vtxy_front", det, vtx_x, vtx_y, ev_weight);
+        lhist->FillHistW("ecal_track_vtxz_vtxx_front", det, vtx_z, vtx_x, ev_weight);
+        lhist->FillHistW("ecal_track_vtxz_vtxy_front", det, vtx_z, vtx_y, ev_weight);
+        lhist->FillHistW("ecal_track_xy_front", det, xx, yy, ev_weight);
+        lhist->FillHistW("ecal_track_pdg_front", det, pdg, ev_weight);
+        lhist->FillHistW("ecal_track_e_front", det, eneg, ev_weight);
+      }
+      if (zz > ecal_zback) {
+        lhist->FillHistW("ecal_track_vtxx_vtxy_back", det, vtx_x, vtx_y, ev_weight);
+        lhist->FillHistW("ecal_track_vtxz_vtxx_back", det, vtx_z, vtx_x, ev_weight);
+        lhist->FillHistW("ecal_track_vtxz_vtxy_back", det, vtx_z, vtx_y, ev_weight);
+        lhist->FillHistW("ecal_track_xy_back", det, xx, yy, ev_weight);
+        lhist->FillHistW("ecal_track_pdg_back", det, pdg, ev_weight);
+        lhist->FillHistW("ecal_track_e_back", det, eneg, ev_weight);
+      }
+
+      if (pdg == 11)  {  
+        lhist->FillHistW("ecal_track_e_electrons", det, eneg, ev_weight); 
+        lhist->FillHistW("ecal_track_vtx_z_electrons", det, vtx_z, ev_weight);
+        lhist->FillHistW("ecal_track_xy_electrons", det, xx, yy, ev_weight);
+        lhist->FillHistW("ecal_track_vtxz_vtxx_electrons", det, vtx_z, vtx_x, ev_weight);
+        lhist->FillHistW("ecal_track_vtxz_vtxy_electrons", det, vtx_z, vtx_y, ev_weight);
+      }
+
+      if (pdg == -11) {  
+        lhist->FillHistW("ecal_track_e_positrons", det, eneg, ev_weight); 
+        lhist->FillHistW("ecal_track_vtx_z_positrons", det, vtx_z, ev_weight);
+        lhist->FillHistW("ecal_track_xy_positrons", det, xx, yy, ev_weight);
+        lhist->FillHistW("ecal_track_vtxz_vtxx_positrons", det, vtx_z, vtx_x, ev_weight);
+        lhist->FillHistW("ecal_track_vtxz_vtxy_positrons", det, vtx_z, vtx_y, ev_weight);
+      }
+
+      if (pdg == 22)  {  
+        lhist->FillHistW("ecal_track_e_gamma", det, eneg, ev_weight); 
+        lhist->FillHistW("ecal_track_vtx_z_gamma", det, vtx_z, ev_weight);
+        lhist->FillHistW("ecal_track_xy_gamma", det, xx, yy, ev_weight);
+        lhist->FillHistW("ecal_track_vtxz_vtxx_gamma", det, vtx_z, vtx_x, ev_weight);
+        lhist->FillHistW("ecal_track_vtxz_vtxy_gamma", det, vtx_z, vtx_y, ev_weight);
+      }
+    }
+
+    if (det_id >= 3000 && det_id <= 3001) {
+      int det = det_id - 3000;
+      lhist->FillHistW("lyso_track_x", det, xx, ev_weight);
+      lhist->FillHistW("lyso_track_y", det, yy, ev_weight);
+      lhist->FillHistW("lyso_track_vtx_z", det, vtx_z, ev_weight);
+      lhist->FillHistW("lyso_track_xy", det, xx, yy, ev_weight);
+      lhist->FillHistW("lyso_track_vtxz_vtxx", det, vtx_z, vtx_x, ev_weight);
+      lhist->FillHistW("lyso_track_vtxz_vtxy", det, vtx_z, vtx_y, ev_weight);
+      if (pdg == 11)  {  
+        lhist->FillHistW("lyso_track_e_electrons", det, eneg, ev_weight); 
+        lhist->FillHistW("lyso_track_vtx_z_electrons", det, vtx_z, ev_weight);
+        lhist->FillHistW("lyso_track_xe_electrons", det, xx, eneg, ev_weight); 
+        lhist->FillHistW("lyso_track_xy_electrons", det, xx, yy, ev_weight);
+        lhist->FillHistW("lyso_track_vtxz_vtxx_electrons", det, vtx_z, vtx_x, ev_weight);
+        lhist->FillHistW("lyso_track_vtxz_vtxy_electrons", det, vtx_z, vtx_y, ev_weight);
+      }
+
+      if (pdg == -11) {  
+        lhist->FillHistW("lyso_track_e_positrons", det, eneg, ev_weight); 
+        lhist->FillHistW("lyso_track_vtx_z_positrons", det, vtx_z, ev_weight);
+        lhist->FillHistW("lyso_track_xe_positrons", det, xx, eneg, ev_weight); 
+        lhist->FillHistW("lyso_track_xy_positrons", det, xx, yy, ev_weight);
+        lhist->FillHistW("lyso_track_vtxz_vtxx_positrons", det, vtx_z, vtx_x, ev_weight);
+        lhist->FillHistW("lyso_track_vtxz_vtxy_positrons", det, vtx_z, vtx_y, ev_weight);
+      }
+
+      if (pdg == 22)  {  
+        lhist->FillHistW("lyso_track_e_gamma", det, eneg, ev_weight); 
+        lhist->FillHistW("lyso_track_vtx_z_gamma", det, vtx_z, ev_weight);
+        lhist->FillHistW("lyso_track_xe_gamma", det, xx, eneg, ev_weight); 
+        lhist->FillHistW("lyso_track_xy_gamma", det, xx, yy, ev_weight);
+        lhist->FillHistW("lyso_track_vtxz_vtxx_gamma", det, vtx_z, vtx_x, ev_weight);
+        lhist->FillHistW("lyso_track_vtxz_vtxy_gamma", det, vtx_z, vtx_y, ev_weight);
+      }
+    }
+
+    if (det_id >= 4000 && det_id <= 4007) {
+      int det = det_id - 4000;
+      lhist->FillHistW("gammamon_track_z", det, zz, ev_weight);
+      lhist->FillHistW("gammamon_track_vtx_z", det, vtx_z, ev_weight);
+      lhist->FillHistW("gammamon_track_xy", det, xx, yy, ev_weight);
+      lhist->FillHistW("gammamon_track_vtxz_vtxx", det, vtx_z, vtx_x, ev_weight);
+      lhist->FillHistW("gammamon_track_vtxz_vtxy", det, vtx_z, vtx_y, ev_weight);
+      if (pdg == 11)  {  
+        lhist->FillHistW("gammamon_track_e_electrons", det, eneg, ev_weight); 
+      }
+
+      if (pdg == -11) {  
+        lhist->FillHistW("gammamon_track_e_positrons", det, eneg, ev_weight); 
+      }
+
+      if (pdg == 22)  {  
+        lhist->FillHistW("gammamon_track_e_gamma", det, eneg, ev_weight); 
+      }
+    }
+    
+    if (det_id == 5000) {
+      int det = det_id - 5000;
+      if (pdg == 11)  {
+        lhist->FillHistW("ip_track_e_electrons", det, eneg, ev_weight); 
+      }
+      if (pdg == -11)  {
+        lhist->FillHistW("ip_track_e_positrons", det, eneg, ev_weight); 
+      }
+      if (pdg == 22)  {
+        lhist->FillHistW("ip_track_e_gamma", det, eneg, ev_weight); 
+        lhist->FillHistW("ip_track_xy_gamma", det, xx, yy, ev_weight);
+        lhist->FillHistW("ip_track_xy_zoom_gamma", det, xx, yy, ev_weight);
+        lhist->FillHistW("ip_track_vtxz_gamma", det, vtx_z, ev_weight);
+      }
+    }
+
+    if (det_id == 6300) {
+      if ( (primary_pdg == 11) && (track_id == 1) && (pzz>0.0) && (abs(yy) < 5.0) && (eneg > 0.02)) {
+        lhist->FillHistW("ce_cherenkov_e_signal", 0, eneg, ev_weight);
+        lhist->FillHistW("ce_cherenkov_x_signal", 0, xx, ev_weight);
+      }
+      int det = 0;
+      if (pdg == 11)  {
+        lhist->FillHistW("ce_cherenkov_e_electrons", det, eneg, ev_weight); 
+        lhist->FillHistW("ce_cherenkov_x_electrons", det, xx, ev_weight); 
+      }
+      if (pdg == -11)  {
+        lhist->FillHistW("ce_cherenkov_e_positrons", det, eneg, ev_weight); 
+        lhist->FillHistW("ce_cherenkov_x_positrons", det, xx, ev_weight); 
+      }
+      if (pdg == 22)  {
+        lhist->FillHistW("ce_cherenkov_e_gamma", det, eneg, ev_weight); 
+        lhist->FillHistW("ce_cherenkov_x_gamma", det, xx, ev_weight); 
+      }
+    } 
+    */
     // Accumulate tracks for one event 
     if (pevent == ev_id) {
       if(debugl)std::cout << "In pevent == ev_id block" << std::endl;
-      event_tracks.push_back(std::make_tuple(track_id, det_id, pdg, xx, yy, zz,eneg, pxx, pyy, pzz, 
-                                              vtx_x, vtx_y, vtx_z, ev_weight));
+      //event_tracks.push_back(std::make_tuple(track_id, det_id, pdg, xx, yy, zz,eneg, pxx, pyy, pzz, vtx_x, vtx_y, vtx_z, ev_weight));
     } else if (pevent != ev_id) {
       if(debugl)std::cout << "In pevent != ev_id block" << std::endl;
-      //TestTracks(pevent, event_tracks, lhist);
-      //TestBremsTracks(pevent, event_tracks, lhist);
-      event_tracks.clear();
-      event_tracks.push_back(std::make_tuple(track_id, det_id, pdg, xx, yy, zz, eneg, pxx, pyy, pzz, 
-                                              vtx_x, vtx_y, vtx_z, ev_weight));
+//       TestTracks(pevent, event_tracks, lhist);
+//       TestBremsTracks(pevent, event_tracks, lhist);
+      //event_tracks.clear();
+      //event_tracks.push_back(std::make_tuple(track_id, det_id, pdg, xx, yy, zz, eneg, pxx, pyy, pzz, vtx_x, vtx_y, vtx_z, ev_weight));
       pevent = ev_id;
     } else { //(pevent > ev_id)
       std::cout << "New event ID is smaller than previous!\n";
@@ -413,7 +675,7 @@ int run_process_track_tree_draw(const char *fnlist = 0, const char *commentstr =
 //    lhist->DrawHist2D_BT15("ip_n_gamma_n_electrons_scint", "ip_n_gamma_n_electrons_scint", "N_gamma", "N_e", "N", "colz");
   
 
-  double binw(1.0), nbx = flist.size();
+  double binw(1.0), nbx = 5.02;//flist.size();
   std::cout << "Number of BX: " << nbx << std::endl;
   //// making histograms of track multiplicity per bunch crossing
   /// loop over the det ids of tracker to fill up the cluster multiplicity
@@ -478,6 +740,63 @@ int run_process_track_tree_draw(const char *fnlist = 0, const char *commentstr =
   "tracking_planes_vtxz_vtxx",
   "tracking_planes_vtxz_vtxy",
   "tracking_planes_vtxx_vtxy",
+  "tracking_planes_track_x_electrons", 
+  "tracking_planes_track_y_electrons", 
+  "tracking_planes_track_e_electrons",
+  "tracking_planes_vtx_z_track_e_electrons",
+  "tracking_planes_vtx_x_track_e_electrons",
+  //"tracking_planes_vtx_x_vtx_z_track_e_electrons",
+  "tracking_planes_track_e_electrons_zoomed", 
+  "tracking_planes_vtx_z_track_e_electrons_zoomed",
+  "tracking_planes_vtx_x_track_e_electrons_zoomed",
+  //"tracking_planes_vtx_x_vtx_z_track_e_electrons_zoomed",
+  "tracking_planes_track_e_electrons_morezoomed", 
+  "tracking_planes_vtx_z_track_e_electrons_morezoomed",
+  "tracking_planes_vtx_x_track_e_electrons_morezoomed",
+  //"tracking_planes_vtx_x_vtx_z_track_e_electrons_morezoomed",
+  "tracking_planes_vtx_z_electrons", 
+  "tracking_planes_track_xy_electrons", 
+  "tracking_planes_vtxz_vtxx_electrons", 
+  "tracking_planes_vtxz_vtxy_electrons", 
+  "tracking_planes_vtxx_vtxy_electrons", 
+  "tracking_planes_track_x_positrons", 
+  "tracking_planes_track_y_positrons", 
+  "tracking_planes_track_e_positrons",
+  "tracking_planes_vtx_z_track_e_positrons",
+  "tracking_planes_vtx_x_track_e_positrons",
+  //"tracking_planes_vtx_x_vtx_z_track_e_positrons",
+  "tracking_planes_track_e_positrons_zoomed", 
+  "tracking_planes_vtx_z_track_e_positrons_zoomed",
+  "tracking_planes_vtx_x_track_e_positrons_zoomed",
+  //"tracking_planes_vtx_x_vtx_z_track_e_positrons_zoomed",
+  "tracking_planes_track_e_positrons_morezoomed", 
+  "tracking_planes_vtx_z_track_e_positrons_morezoomed",
+  "tracking_planes_vtx_x_track_e_positrons_morezoomed",
+  //"tracking_planes_vtx_x_vtx_z_track_e_positrons_morezoomed", 
+  "tracking_planes_vtx_z_positrons", 
+  "tracking_planes_track_xy_positrons", 
+  "tracking_planes_vtxz_vtxx_positrons", 
+  "tracking_planes_vtxz_vtxy_positrons", 
+  "tracking_planes_vtxx_vtxy_positrons",
+  "tracking_planes_track_x_gamma", 
+  "tracking_planes_track_y_gamma", 
+  "tracking_planes_track_e_gamma",
+  "tracking_planes_vtx_z_track_e_gamma",
+  "tracking_planes_vtx_x_track_e_gamma",
+  //"tracking_planes_vtx_x_vtx_z_track_e_gamma",
+  "tracking_planes_track_e_gamma_zoomed", 
+  "tracking_planes_vtx_z_track_e_gamma_zoomed",
+  "tracking_planes_vtx_x_track_e_gamma_zoomed",
+  //"tracking_planes_vtx_x_vtx_z_track_e_gamma_zoomed",
+  "tracking_planes_track_e_gamma_morezoomed", 
+  "tracking_planes_vtx_z_track_e_gamma_morezoomed",
+  "tracking_planes_vtx_x_track_e_gamma_morezoomed",
+  //"tracking_planes_vtx_x_vtx_z_track_e_gamma_morezoomed",
+  "tracking_planes_vtx_z_gamma", 
+  "tracking_planes_track_xy_gamma", 
+  "tracking_planes_vtxz_vtxx_gamma", 
+  "tracking_planes_vtxz_vtxy_gamma", 
+  "tracking_planes_vtxx_vtxy_gamma",
   "tracking_planes_signal_track_x_positrons", 
   "tracking_planes_signal_track_y_positrons", 
   "tracking_planes_signal_track_e_positrons", 
@@ -599,11 +918,8 @@ int run_process_track_tree_draw(const char *fnlist = 0, const char *commentstr =
 //   if (hhbw) binwtrackx = hhbw->GetBinWidth(1); else std::cerr << "Error to get X bin width. Can not normilaze!\n";
 //   print the integral of the histograms
   if(debugl)std::cout << "After Bx normalization" << std::endl;
-  std::string suffix("");
-  std::string foutname = fnamelist.substr(fnamelist.find_last_of("/")+1);
-  foutname = foutname.substr(0, foutname.find_last_of("."));
-  foutname += suffix + std::string(".root");
-  lhist->SaveHists(foutname);
+  
+  lhist->SaveHists("backgroundFiles_All.root");
 
   delete track_tree;
   delete lhist;
@@ -784,7 +1100,7 @@ void CreateHistograms(MHists *mh)
 {
   std::cout << "Creating histograms\n";
   int ndet = 16;
-  
+  bool debugCH = false;
   /// general plots
   mh->AddHists("tracking_planes_track_x", ndet, 1300, -650.0, 650.0);
   mh->AddHists("tracking_planes_track_y", ndet, 2000, -25.0, 25.0);
@@ -805,6 +1121,71 @@ void CreateHistograms(MHists *mh)
   mh->AddHists("tracking_planes_vtxz_vtxx", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
   mh->AddHists("tracking_planes_vtxz_vtxy", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
   mh->AddHists("tracking_planes_vtxx_vtxy", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
+  if(debugCH)std::cout << "Created general plots" << std::endl;
+  /// electrons
+  mh->AddHists("tracking_planes_track_x_electrons", ndet, 1300, -650.0, 650.0);
+  mh->AddHists("tracking_planes_track_y_electrons", ndet, 2000, -25.0, 25.0);
+  mh->AddHists("tracking_planes_track_e_electrons", ndet, 2000, 0.0, 20.0); 
+  mh->AddHists("tracking_planes_vtx_z_track_e_electrons", ndet, 1000, -10000, 20000, 2000, 0.0, 20.0);
+  mh->AddHists("tracking_planes_vtx_x_track_e_electrons", ndet, 300, -3000, 3000, 2000, 0.0, 20.0);
+  //mh->AddHists("tracking_planes_vtx_x_vtx_z_track_e_electrons", ndet, 300, -3000, 3000, 1000, -10000, 20000, 2000, 0.0, 20.0);
+  mh->AddHists("tracking_planes_track_e_electrons_zoomed", ndet, 1000, 0.0, 1.0); 
+  mh->AddHists("tracking_planes_vtx_z_track_e_electrons_zoomed", ndet, 1000, -10000, 20000, 1000, 0.0, 1.0);
+  mh->AddHists("tracking_planes_vtx_x_track_e_electrons_zoomed", ndet, 300, -3000, 3000, 1000, 0.0, 1.0);
+  //mh->AddHists("tracking_planes_vtx_x_vtx_z_track_e_electrons_zoomed", ndet, 300, -3000, 3000, 1000, -10000, 20000, 1000, 0.0, 1.0);
+  mh->AddHists("tracking_planes_track_e_electrons_morezoomed", ndet, 500, 0.0, 0.05); 
+  mh->AddHists("tracking_planes_vtx_z_track_e_electrons_morezoomed", ndet, 1000, -10000, 20000, 1000, 0.0, 0.05); 
+  mh->AddHists("tracking_planes_vtx_x_track_e_electrons_morezoomed", ndet, 300, -3000, 3000, 500, 0.0, 0.05);
+  //mh->AddHists("tracking_planes_vtx_x_vtx_z_track_e_electrons_morezoomed", ndet, 300, -3000, 3000, 1000, -10000, 20000, 500, 0.0, 0.05);
+  mh->AddHists("tracking_planes_vtx_z_electrons", ndet, 300, -10000.0, 20000.0);
+  mh->AddHists("tracking_planes_track_xy_electrons", ndet, 1300, -650.0, 650.0, 50, -25.0, 25.0);
+  mh->AddHists("tracking_planes_vtxz_vtxx_electrons", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("tracking_planes_vtxz_vtxy_electrons", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("tracking_planes_vtxx_vtxy_electrons", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
+  if(debugCH)std::cout << "Created electrons plots" << std::endl;
+  /// positrons
+  mh->AddHists("tracking_planes_track_x_positrons", ndet, 1300, -650.0, 650.0);
+  mh->AddHists("tracking_planes_track_y_positrons", ndet, 2000, -25.0, 25.0);
+  mh->AddHists("tracking_planes_track_e_positrons", ndet, 2000, 0.0, 20.0); 
+  mh->AddHists("tracking_planes_vtx_z_track_e_positrons", ndet, 1000, -10000, 20000, 2000, 0.0, 20.0);
+  mh->AddHists("tracking_planes_vtx_x_track_e_positrons", ndet, 300, -3000, 3000, 2000, 0.0, 20.0);
+  //mh->AddHists("tracking_planes_vtx_x_vtx_z_track_e_positrons", ndet, 300, -3000, 3000, 1000, -10000, 20000, 2000, 0.0, 20.0);
+  mh->AddHists("tracking_planes_track_e_positrons_zoomed", ndet, 1000, 0.0, 1.0); 
+  mh->AddHists("tracking_planes_vtx_z_track_e_positrons_zoomed", ndet, 1000, -10000, 20000, 1000, 0.0, 1.0);
+  mh->AddHists("tracking_planes_vtx_x_track_e_positrons_zoomed", ndet, 300, -3000, 3000, 1000, 0.0, 1.0);
+  //mh->AddHists("tracking_planes_vtx_x_vtx_z_track_e_positrons_zoomed", ndet, 300, -3000, 3000, 1000, -10000, 20000, 1000, 0.0, 1.0);
+  mh->AddHists("tracking_planes_track_e_positrons_morezoomed", ndet, 500, 0.0, 0.05); 
+  mh->AddHists("tracking_planes_vtx_z_track_e_positrons_morezoomed", ndet, 1000, -10000, 20000, 1000, 0.0, 0.05); 
+  mh->AddHists("tracking_planes_vtx_x_track_e_positrons_morezoomed", ndet, 300, -3000, 3000, 500, 0.0, 0.05);
+  //mh->AddHists("tracking_planes_vtx_x_vtx_z_track_e_positrons_morezoomed", ndet, 300, -3000, 3000, 1000, -10000, 20000, 500, 0.0, 0.05);
+  mh->AddHists("tracking_planes_vtx_z_positrons", ndet, 300, -10000.0, 20000.0);
+  mh->AddHists("tracking_planes_track_xy_positrons", ndet, 1300, -650.0, 650.0, 50, -25.0, 25.0);
+  mh->AddHists("tracking_planes_vtxz_vtxx_positrons", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("tracking_planes_vtxz_vtxy_positrons", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("tracking_planes_vtxx_vtxy_positrons", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
+  if(debugCH)std::cout << "Created positron plots" << std::endl;
+  /// gamma
+  mh->AddHists("tracking_planes_track_x_gamma", ndet, 1300, -650.0, 650.0);
+  mh->AddHists("tracking_planes_track_y_gamma", ndet, 2000, -25.0, 25.0);
+  mh->AddHists("tracking_planes_track_e_gamma", ndet, 2000, 0.0, 20.0); 
+  mh->AddHists("tracking_planes_vtx_z_track_e_gamma", ndet, 1000, -10000, 20000, 2000, 0.0, 20.0);
+  mh->AddHists("tracking_planes_vtx_x_track_e_gamma", ndet, 300, -3000, 3000, 2000, 0.0, 20.0);
+  //mh->AddHists("tracking_planes_vtx_x_vtx_z_track_e_gamma", ndet, 300, -3000, 3000, 1000, -10000, 20000, 2000, 0.0, 20.0);
+  mh->AddHists("tracking_planes_track_e_gamma_zoomed", ndet, 1000, 0.0, 1.0); 
+  mh->AddHists("tracking_planes_vtx_z_track_e_gamma_zoomed", ndet, 1000, -10000, 20000, 1000, 0.0, 1.0);
+  mh->AddHists("tracking_planes_vtx_x_track_e_gamma_zoomed", ndet, 300, -3000, 3000, 1000, 0.0, 1.0);
+  //mh->AddHists("tracking_planes_vtx_x_vtx_z_track_e_gamma_zoomed", ndet, 300, -3000, 3000, 1000, -10000, 20000, 1000, 0.0, 1.0);
+  mh->AddHists("tracking_planes_track_e_gamma_morezoomed", ndet, 500, 0.0, 0.05); 
+  mh->AddHists("tracking_planes_vtx_z_track_e_gamma_morezoomed", ndet, 1000, -10000, 20000, 1000, 0.0, 0.05); 
+  mh->AddHists("tracking_planes_vtx_x_track_e_gamma_morezoomed", ndet, 300, -3000, 3000, 500, 0.0, 0.05);
+  //mh->AddHists("tracking_planes_vtx_x_vtx_z_track_e_gamma_morezoomed", ndet, 300, -3000, 3000, 1000, -10000, 20000, 500, 0.0, 0.05);
+  mh->AddHists("tracking_planes_vtx_z_gamma", ndet, 300, -10000.0, 20000.0);
+  mh->AddHists("tracking_planes_track_xy_gamma", ndet, 1300, -650.0, 650.0, 50, -25.0, 25.0);
+  mh->AddHists("tracking_planes_vtxz_vtxx_gamma", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("tracking_planes_vtxz_vtxy_gamma", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("tracking_planes_vtxx_vtxy_gamma", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
+  if(debugCH)std::cout << "Created gamma plots" << std::endl;
+  
   /// signal positrons
   mh->AddHists("tracking_planes_signal_track_x_positrons", ndet, 1300, -650.0, 650.0);
   mh->AddHists("tracking_planes_signal_track_y_positrons", ndet, 2000, -25.0, 25.0);
@@ -825,7 +1206,7 @@ void CreateHistograms(MHists *mh)
   mh->AddHists("tracking_planes_signal_vtxz_vtxx_positrons", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
   mh->AddHists("tracking_planes_signal_vtxz_vtxy_positrons", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
   mh->AddHists("tracking_planes_signal_vtxx_vtxy_positrons", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
-  
+  if(debugCH)std::cout << "Created signal positrons plots" << std::endl;
   
   
   /// signal electrons
@@ -848,7 +1229,7 @@ void CreateHistograms(MHists *mh)
   mh->AddHists("tracking_planes_signal_vtxz_vtxx_electrons", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
   mh->AddHists("tracking_planes_signal_vtxz_vtxy_electrons", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
   mh->AddHists("tracking_planes_signal_vtxx_vtxy_electrons", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
-  
+  if(debugCH)std::cout << "Created signal electron plots" << std::endl;
   
   
   /// signal gamma
@@ -871,7 +1252,7 @@ void CreateHistograms(MHists *mh)
   mh->AddHists("tracking_planes_signal_vtxz_vtxx_gamma", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
   mh->AddHists("tracking_planes_signal_vtxz_vtxy_gamma", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
   mh->AddHists("tracking_planes_signal_vtxx_vtxy_gamma", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
-  
+  if(debugCH)std::cout << "Created signal gamma plots" << std::endl;
   
   
   
@@ -896,7 +1277,7 @@ void CreateHistograms(MHists *mh)
   mh->AddHists("tracking_planes_background_vtxz_vtxx_positrons", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
   mh->AddHists("tracking_planes_background_vtxz_vtxy_positrons", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
   mh->AddHists("tracking_planes_background_vtxx_vtxy_positrons", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
-  
+  if(debugCH)std::cout << "Created general background plots" << std::endl;
   
   
   /// background electrons
@@ -919,7 +1300,7 @@ void CreateHistograms(MHists *mh)
   mh->AddHists("tracking_planes_background_vtxz_vtxx_electrons", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
   mh->AddHists("tracking_planes_background_vtxz_vtxy_electrons", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
   mh->AddHists("tracking_planes_background_vtxx_vtxy_electrons", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
-  
+  if(debugCH)std::cout << "Created background electron plots" << std::endl;
   
   /// background gamma
   mh->AddHists("tracking_planes_background_track_x_gamma", ndet, 1300, -650.0, 650.0);
@@ -941,7 +1322,7 @@ void CreateHistograms(MHists *mh)
   mh->AddHists("tracking_planes_background_vtxz_vtxx_gamma", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
   mh->AddHists("tracking_planes_background_vtxz_vtxy_gamma", ndet, 1000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
   mh->AddHists("tracking_planes_background_vtxx_vtxy_gamma", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
-  
+  if(debugCH)std::cout << "Created background gamma plots" << std::endl;
   
   
 //   mh->AddHists("tracking_planes_track_multiplicity", ndet, 10000, 0.0, 10000.0);
@@ -961,6 +1342,167 @@ void CreateHistograms(MHists *mh)
   mh->AddHists("tracking_planes_track_xy_charged_tracks_cut", ndet, 650, -650.0, 650.0, 25, -25.0, 25.0);
 
   mh->AddHists("tracking_planes_n_track_cross", 1, 20, 0.0, 20.0);
+  
+  
+  
+  
+  
+  /*
+  ndet = 2;
+  mh->AddHists("ecal_track_x", ndet, 1300, -650.0, 650.0);
+  mh->AddHists("ecal_track_y", ndet, 100, -50.0, 50.0);
+  mh->AddHists("ecal_track_xy", ndet, 1300, -650.0, 650.0, 100, -50.0, 50.0);
+  mh->AddHists("ecal_track_xy_electrons", ndet, 1300, -650.0, 650.0, 100, -50.0, 50.0);
+  mh->AddHists("ecal_track_xy_gamma", ndet, 1300, -650.0, 650.0, 100, -50.0, 50.0);
+  mh->AddHists("ecal_track_xy_positrons", ndet, 1300, -650.0, 650.0, 100, -50.0, 50.0);
+  mh->AddHists("ecal_track_vtx_z", ndet, 30000, -10000.0, 20000.0);
+  mh->AddHists("ecal_track_vtx_z_electrons", ndet, 30000, -10000.0, 20000.0);
+  mh->AddHists("ecal_track_vtx_z_gamma", ndet, 30000, -10000.0, 20000.0);
+  mh->AddHists("ecal_track_vtx_z_positrons", ndet, 30000, -10000.0, 20000.0);
+  mh->AddHists("ecal_track_vtxz_vtxx", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("ecal_track_vtxz_vtxy", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("ecal_track_vtxx_vtxy", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("ecal_track_vtxx_vtxy_zcut", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("ecal_track_vtxz_vtxx_zcut", ndet, 2000, 3000.0, 5000.0, 2000, -2000.0, 2000.0);
+  mh->AddHists("ecal_track_vtxz_vtxy_zcut", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("ecal_track_vtxz_vtxx_electrons", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("ecal_track_vtxz_vtxy_electrons", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("ecal_track_vtxx_vtxy_electrons", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("ecal_track_vtxz_vtxx_gamma", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("ecal_track_vtxz_vtxy_gamma", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("ecal_track_vtxx_vtxy_gamma", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("ecal_track_vtxz_vtxx_positrons", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("ecal_track_vtxz_vtxy_positrons", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("ecal_track_vtxx_vtxy_positrons", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("ecal_track_e_electrons", ndet, 2000, 0.0, 20.0);
+  mh->AddHists("ecal_track_e_positrons", ndet, 2000, 0.0, 20.0);
+  mh->AddHists("ecal_track_e_gamma", ndet, 2000, 0.0, 20.0);
+  mh->AddHists("ecal_track_pdg_zcut", ndet, 200, -100.0, 100.0);
+  mh->AddHists("ecal_track_e_zcut", ndet, 2000, 0.0, 20.0);
+
+  int nvtxz = 14000;
+  int nvtxx = 200;
+  int nvtxy = 200;
+  double vtxz_min = -8000.0;
+  double vtxz_max =  6000.0;
+  double vtxx_min = -100.0;
+  double vtxx_max =  100.0;
+  double vtxy_min = -100.0;
+  double vtxy_max =  100.0;
+  mh->AddHists("ecal_track_vtxz_vtxx_top", ndet, nvtxz, vtxz_min, vtxz_max, nvtxx, vtxx_min, vtxx_max);
+  mh->AddHists("ecal_track_vtxz_vtxy_top", ndet, nvtxz, vtxz_min, vtxz_max, nvtxy, vtxy_min, vtxy_max);
+  mh->AddHists("ecal_track_vtxx_vtxy_top", ndet, nvtxx, vtxx_min, vtxx_max, nvtxy, vtxy_min, vtxy_max);
+  mh->AddHists("ecal_track_zx_top", ndet, 100, 4200.0, 4400.0, 600, -600.0, 600.0);
+  mh->AddHists("ecal_track_e_top", ndet, 2000, 0.0, 20.0);
+
+  mh->AddHists("ecal_track_vtxz_vtxx_bottom", ndet, nvtxz, vtxz_min, vtxz_max, nvtxx, vtxx_min, vtxx_max);
+  mh->AddHists("ecal_track_vtxz_vtxy_bottom", ndet, nvtxz, vtxz_min, vtxz_max, nvtxy, vtxy_min, vtxy_max);
+  mh->AddHists("ecal_track_vtxx_vtxy_bottom", ndet, nvtxx, vtxx_min, vtxx_max, nvtxy, vtxy_min, vtxy_max);
+  mh->AddHists("ecal_track_zx_bottom", ndet, 100, 4200.0, 4400.0, 600, -600.0, 600.0);
+  mh->AddHists("ecal_track_e_bottom", ndet, 2000, 0.0, 20.0);
+
+  mh->AddHists("ecal_track_vtxz_vtxx_left", ndet, nvtxz, vtxz_min, vtxz_max, nvtxx, vtxx_min, vtxx_max);
+  mh->AddHists("ecal_track_vtxz_vtxy_left", ndet, nvtxz, vtxz_min, vtxz_max, nvtxy, vtxy_min, vtxy_max);
+  mh->AddHists("ecal_track_vtxx_vtxy_left", ndet, nvtxx, vtxx_min, vtxx_max, nvtxy, vtxy_min, vtxy_max);
+  mh->AddHists("ecal_track_zy_left", ndet, 100, 4200.0, 4400.0, 35, -35.0, 35.0);
+  mh->AddHists("ecal_track_e_left", ndet, 2000, 0.0, 20.0);
+
+  mh->AddHists("ecal_track_vtxz_vtxx_right", ndet, nvtxz, vtxz_min, vtxz_max, nvtxx, vtxx_min, vtxx_max);
+  mh->AddHists("ecal_track_vtxz_vtxy_right", ndet, nvtxz, vtxz_min, vtxz_max, nvtxy, vtxy_min, vtxy_max);
+  mh->AddHists("ecal_track_vtxx_vtxy_right", ndet, nvtxx, vtxx_min, vtxx_max, nvtxy, vtxy_min, vtxy_max);
+  mh->AddHists("ecal_track_zy_right", ndet, 100, 4200.0, 4400.0, 35, -35.0, 35.0);
+  mh->AddHists("ecal_track_e_right", ndet, 2000, 0.0, 20.0);
+
+  mh->AddHists("ecal_track_vtxz_vtxx_inner", ndet, nvtxz, vtxz_min, vtxz_max, nvtxx, vtxx_min, vtxx_max);
+  mh->AddHists("ecal_track_vtxz_vtxy_inner", ndet, nvtxz, vtxz_min, vtxz_max, nvtxy, vtxy_min, vtxy_max);
+  mh->AddHists("ecal_track_vtxx_vtxy_inner", ndet, nvtxx, vtxx_min, vtxx_max, nvtxy, vtxy_min, vtxy_max);
+  mh->AddHists("ecal_track_zy_inner", ndet, 100, 4200.0, 4400.0, 35, -35.0, 35.0);
+  mh->AddHists("ecal_track_e_inner", ndet, 2000, 0.0, 20.0);
+
+  mh->AddHists("ecal_track_vtxz_vtxx_front", ndet, nvtxz, vtxz_min, vtxz_max, nvtxx, vtxx_min, vtxx_max);
+  mh->AddHists("ecal_track_vtxz_vtxy_front", ndet, nvtxz, vtxz_min, vtxz_max, nvtxy, vtxy_min, vtxy_max);
+  mh->AddHists("ecal_track_vtxx_vtxy_front", ndet, nvtxx, vtxx_min, vtxx_max, nvtxy, vtxy_min, vtxy_max);
+  mh->AddHists("ecal_track_xy_front", ndet, 600, -600.0, 600.0, 35, -35.0, 35.0);
+  mh->AddHists("ecal_track_pdg_front", ndet, 200, -100.0, 100.0);
+  mh->AddHists("ecal_track_e_front", ndet, 2000, 0.0, 20.0);
+
+  mh->AddHists("ecal_track_vtxz_vtxx_back", ndet, nvtxz, vtxz_min, vtxz_max, nvtxx, vtxx_min, vtxx_max);
+  mh->AddHists("ecal_track_vtxz_vtxy_back", ndet, nvtxz, vtxz_min, vtxz_max, nvtxy, vtxy_min, vtxy_max);
+  mh->AddHists("ecal_track_vtxx_vtxy_back", ndet, nvtxx, vtxx_min, vtxx_max, nvtxy, vtxy_min, vtxy_max);
+  mh->AddHists("ecal_track_xy_back", ndet, 600, -600.0, 600.0, 35, -35.0, 35.0);
+  mh->AddHists("ecal_track_pdg_back", ndet, 200, -100.0, 100.0);
+  mh->AddHists("ecal_track_e_back", ndet, 2000, 0.0, 20.0);
+
+  
+  ndet = 2;
+  mh->AddHists("lyso_track_x", ndet, 800, -400.0, 400.0);
+  mh->AddHists("lyso_track_y", ndet, 100, -50.0, 50.0);
+  mh->AddHists("lyso_track_xy", ndet, 800, -400.0, 400.0, 100, -50.0, 50.0);
+  mh->AddHists("lyso_track_xy_electrons", ndet, 800, -400.0, 400.0, 100, -50.0, 50.0);
+  mh->AddHists("lyso_track_xy_gamma", ndet, 800, -400.0, 400.0, 100, -50.0, 50.0);
+  mh->AddHists("lyso_track_xy_positrons", ndet, 800, -400.0, 400.0, 100, -50.0, 50.0);
+  mh->AddHists("lyso_track_vtx_z", ndet, 30000, -10000.0, 20000.0);
+  mh->AddHists("lyso_track_vtx_z_electrons", ndet, 30000, -10000.0, 20000.0);
+  mh->AddHists("lyso_track_vtx_z_gamma", ndet, 30000, -10000.0, 20000.0);
+  mh->AddHists("lyso_track_vtx_z_positrons", ndet, 30000, -10000.0, 20000.0);
+  mh->AddHists("lyso_track_vtxz_vtxx", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("lyso_track_vtxz_vtxy", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("lyso_track_vtxx_vtxy", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("lyso_track_vtxz_vtxx_electrons", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("lyso_track_vtxz_vtxy_electrons", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("lyso_track_vtxx_vtxy_electrons", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("lyso_track_vtxz_vtxx_gamma", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("lyso_track_vtxz_vtxy_gamma", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("lyso_track_vtxx_vtxy_gamma", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("lyso_track_vtxz_vtxx_positrons", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("lyso_track_vtxz_vtxy_positrons", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("lyso_track_vtxx_vtxy_positrons", ndet, 300, -3000.0, 3000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("lyso_track_e_electrons", ndet, 2000, 0.0, 20.0);
+  mh->AddHists("lyso_track_e_positrons", ndet, 2000, 0.0, 20.0);
+  mh->AddHists("lyso_track_e_gamma", ndet, 2000, 0.0, 20.0);
+  mh->AddHists("lyso_track_xe_electrons", ndet, 800, -400.0, 400.0, 200, 0.0, 20.0);
+  mh->AddHists("lyso_track_xe_positrons", ndet, 800, -400.0, 400.0, 200, 0.0, 20.0);
+  mh->AddHists("lyso_track_xe_gamma", ndet, 800, -400.0, 400.0, 200, 0.0, 20.0);
+
+  ndet = 8;
+  mh->AddHists("gammamon_track_z", ndet, 2000, 13000.0, 15000.0);
+  mh->AddHists("gammamon_track_xy", ndet, 400, -200.0, 200.0, 400, -200.0, 200.0);
+  mh->AddHists("gammamon_track_vtx_z", ndet, 30000, -10000.0, 20000.0);
+  mh->AddHists("gammamon_track_vtxz_vtxx", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("gammamon_track_vtxz_vtxy", ndet, 3000, -10000.0, 20000.0, 300, -3000.0, 3000.0);
+  mh->AddHists("gammamon_track_e_electrons", ndet, 2000, 0.0, 20.0);
+  mh->AddHists("gammamon_track_e_positrons", ndet, 2000, 0.0, 20.0);
+  mh->AddHists("gammamon_track_e_gamma", ndet, 2000, 0.0, 20.0);
+  
+  ndet = 1;
+  mh->AddHists("ip_track_e_electrons", ndet, 200, 0.0, 20.0);
+  mh->AddHists("ip_track_e_positrons", ndet, 200, 0.0, 20.0);
+  mh->AddHists("ip_track_e_gamma", ndet, 200, 0.0, 20.0);
+  mh->AddHists("ip_track_xy_gamma", ndet, 100, -50.0, 50.0, 100, -50.0, 50.0);
+  mh->AddHists("ip_track_xy_zoom_gamma", ndet, 400, -0.02, 0.02, 400, -0.02, 0.02);
+  mh->AddHists("ip_track_vtxz_gamma", ndet, 30000, -10000.0, 20000.0);
+  
+  mh->AddHists("ip_n_gamma_n_electrons_scint", ndet, 20, 0.0, 20.0, 20, 0.0, 20.0);
+  mh->AddHists("ip_n_gamma_7gev_n_electrons_scint", ndet, 20, 0.0, 20.0, 20, 0.0, 20.0);
+  mh->AddHists("ip_n_gamma_n_electrons_cherenkov", ndet, 20, 0.0, 20.0, 20, 0.0, 20.0);
+  mh->AddHists("ip_e_gamma_7gev_n_electrons_cherenkov", ndet, 20, 0.0, 20.0, 20, 0.0, 20.0);
+  
+  mh->AddHists("ip_e_gamma_y_electrons_scint", ndet, 1000, -1000.0, 0.0, 200, 0.0, 20.0);
+  mh->AddHists("ip_e_gamma_y_electrons_cherenkov", ndet, 1000, -1000.0, 0.0, 200, 0.0, 20.0);
+  
+  
+  
+  mh->AddHists("ce_cherenkov_e_signal", ndet, 200, 0.0, 20.0);
+  mh->AddHists("ce_cherenkov_x_signal", ndet, 600, -600.0, 0.0);
+  
+  mh->AddHists("ce_cherenkov_e_electrons", ndet, 200, 0.0, 20.0);
+  mh->AddHists("ce_cherenkov_x_electrons", ndet, 600, -600.0, 0.0);
+  mh->AddHists("ce_cherenkov_e_positrons", ndet, 200, 0.0, 20.0);
+  mh->AddHists("ce_cherenkov_x_positrons", ndet, 600, -600.0, 0.0);
+
+  mh->AddHists("ce_cherenkov_e_gamma", ndet, 200, 0.0, 20.0);
+  mh->AddHists("ce_cherenkov_x_gamma", ndet, 600, -600.0, 0.0);
+  */
   
   ndet = 1; //6300
   mh->AddHists("primary_e_electron", ndet, 200, 0.0, 20.0);

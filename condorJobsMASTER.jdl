@@ -1,0 +1,12 @@
+Universe                = vanilla
+Executable              = XXX
+Input                   = ZZZ, MMC, MMH
+should_transfer_files   = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files    = ZZZ, MMC, MMH
+transfer_output_files   = HHH
+Output                  = AAA
+Error                   = BBB
+log                     = CCC
+
+queue 1

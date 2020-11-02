@@ -4,11 +4,11 @@
 
 #ifndef __RUN_PROC_TREE__
 
-void process_track_tree_draw_v3(const char *fnlist = 0, const char *commentstr = 0)
+void process_track_tree_draw_v5(const char *fnlist = 0, const char *commentstr = 0)
 {
    gROOT->ProcessLineSync("#define __RUN_PROC_TREE__ 1");
    gROOT->ProcessLineSync(".L MHists.C+");
-   gROOT->ProcessLine("#include \"process_track_tree_draw_v3.C\"");
+   gROOT->ProcessLine("#include \"process_track_tree_draw_v5.C\"");
    gROOT->ProcessLine(fnlist ? Form("run_process_track_tree_draw(\"%s\")", fnlist) : "run_process_track_tree_draw(0)");
    gROOT->ProcessLine("#undef __RUN_PROC_TREE__");
 }
@@ -47,7 +47,7 @@ int run_process_track_tree_draw(const char *fnlist = 0, const char *commentstr =
   int debugl = 0; //1;
 
   if (!fnlist) {
-    std::cout << "Usage: root -l process_track_tree_draw_v3.C\'(\"file_with_list_of_mc_files\")\'\n";
+    std::cout << "Usage: root -l process_track_tree_draw_v5.C\'(\"file_with_list_of_mc_files\")\'\n";
     return -1;
   }
   
@@ -165,9 +165,9 @@ int run_process_track_tree_draw(const char *fnlist = 0, const char *commentstr =
       }
     }
     if(debugl)std::cout << "After getting primary particle energies" << std::endl;
-    if (primary_pdg == -99) {
-      std::cout << "WARNING! Primary is not found in event " << ev_id << std::endl;
-    }
+//     if (primary_pdg == -99) {
+//       std::cout << "WARNING! Primary is not found in event " << ev_id << std::endl;
+//     }
 
   for (size_t ii = 0; ii < ntrck; ++ii) {
     int det_id, pdg, track_id;
@@ -388,15 +388,13 @@ int run_process_track_tree_draw(const char *fnlist = 0, const char *commentstr =
     // Accumulate tracks for one event 
     if (pevent == ev_id) {
       if(debugl)std::cout << "In pevent == ev_id block" << std::endl;
-      event_tracks.push_back(std::make_tuple(track_id, det_id, pdg, xx, yy, zz,eneg, pxx, pyy, pzz, 
-                                              vtx_x, vtx_y, vtx_z, ev_weight));
+      //event_tracks.push_back(std::make_tuple(track_id, det_id, pdg, xx, yy, zz,eneg, pxx, pyy, pzz, vtx_x, vtx_y, vtx_z, ev_weight));
     } else if (pevent != ev_id) {
       if(debugl)std::cout << "In pevent != ev_id block" << std::endl;
       //TestTracks(pevent, event_tracks, lhist);
       //TestBremsTracks(pevent, event_tracks, lhist);
-      event_tracks.clear();
-      event_tracks.push_back(std::make_tuple(track_id, det_id, pdg, xx, yy, zz, eneg, pxx, pyy, pzz, 
-                                              vtx_x, vtx_y, vtx_z, ev_weight));
+      //event_tracks.clear();
+      //event_tracks.push_back(std::make_tuple(track_id, det_id, pdg, xx, yy, zz, eneg, pxx, pyy, pzz, vtx_x, vtx_y, vtx_z, ev_weight));
       pevent = ev_id;
     } else { //(pevent > ev_id)
       std::cout << "New event ID is smaller than previous!\n";
@@ -413,7 +411,7 @@ int run_process_track_tree_draw(const char *fnlist = 0, const char *commentstr =
 //    lhist->DrawHist2D_BT15("ip_n_gamma_n_electrons_scint", "ip_n_gamma_n_electrons_scint", "N_gamma", "N_e", "N", "colz");
   
 
-  double binw(1.0), nbx = flist.size();
+  double binw(1.0), nbx = 5.02;
   std::cout << "Number of BX: " << nbx << std::endl;
   //// making histograms of track multiplicity per bunch crossing
   /// loop over the det ids of tracker to fill up the cluster multiplicity
@@ -599,11 +597,7 @@ int run_process_track_tree_draw(const char *fnlist = 0, const char *commentstr =
 //   if (hhbw) binwtrackx = hhbw->GetBinWidth(1); else std::cerr << "Error to get X bin width. Can not normilaze!\n";
 //   print the integral of the histograms
   if(debugl)std::cout << "After Bx normalization" << std::endl;
-  std::string suffix("");
-  std::string foutname = fnamelist.substr(fnamelist.find_last_of("/")+1);
-  foutname = foutname.substr(0, foutname.find_last_of("."));
-  foutname += suffix + std::string(".root");
-  lhist->SaveHists(foutname);
+  lhist->SaveHists("backgroundFiles_All.root");
 
   delete track_tree;
   delete lhist;

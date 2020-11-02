@@ -8,36 +8,39 @@ void process_hits_tree_draw_v2(const char *fnlist = 0, const char *commentstr = 
    gROOT->ProcessLineSync("#define __RUN_PROC_HITS_TREE__ 1");
    gROOT->ProcessLineSync(".L MHists.C+");
    gROOT->ProcessLine("#include \"process_hits_tree_draw_v2.C\"");
-   gROOT->ProcessLine(fnlist ? Form("process_hits_tree_draw(\"%s\")", fnlist) : "process_hits_tree_draw(0)");
+   gROOT->ProcessLine(Form("process_hits_tree_draw(\"%s\")", fnlist));
    gROOT->ProcessLine("#undef __RUN_PROC_HITS_TREE__");
 }
 
 #else
 
-//#include <iostream>
-//#include <iomanip>
-//#include <fstream>
-//#include <sstream>
-//#include <string>
-//#include <vector>
-//#include <algorithm>
-//#include <stdexcept>
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <algorithm>
+#include <stdexcept>
+#include <limits>
+#include <math.h>
+#include <chrono>
 
-//#include "TChain.h"
+#include "TChain.h"
 
-//#include "MHists.h"
+#include "MHists.h"
 
 int ProcessList(const std::string &fnamelist, std::vector<std::string> &flist);
+void SetFormat(TH1  *hh);
 void CreateHistograms(MHists *mh);
 
 
 int process_hits_tree_draw(const char *fnlist = 0, const char *commentstr = 0)
 {
 
-  int debugl = 0; //1;
+  int debugl = 1; //1;
 
   if (!fnlist) {
-    std::cout << "Usage: root -l process_hits_tree_draw_v2.C\'(\"file_with_list_of_mc_files\")\'\n";
+    std::cout << "Usage: root -l process_lxsim_tree_draw.C\'(\"file_with_list_of_mc_files\")\'\n";
     return -1;
   }
   
@@ -83,11 +86,13 @@ int process_hits_tree_draw(const char *fnlist = 0, const char *commentstr = 0)
   const double zproj = 2748.0;
 
   Long64_t nevproc = hitstree->GetEntries();
+  if(debugl)std::cout << "After the assignment of the trees. Entries: " << nevproc << std::endl;
+  
   for (Long64_t ii = 0; ii < nevproc; ++ii) {
     hitstree->GetEntry(ii);
 
     if (!(ii % 10000000)) { std::cout << "Event " << ii << std::endl; }
-
+    if(debugl)std::cout << "Inside the loop, processing: " << ii << std::endl;
     if (det_id >= 1000 && det_id <= 1008) {
       const int nlayers = 16;  
       int det = det_id - 1000;
@@ -97,7 +102,8 @@ int process_hits_tree_draw(const char *fnlist = 0, const char *commentstr = 0)
       lhist->FillHistW("tracking_planes_hits_xy", detlayer, cell_x, cell_y, ev_weight);
       lhist->FillHistW("tracking_planes_hits_xy_edep", detlayer, cell_x, cell_y, e_dep*ev_weight);
     }
-
+    
+    /*
     if (det_id >= 2000 && det_id <= 2001) {
       const int nlayers = 21;  
       int det = det_id - 2000;
@@ -123,17 +129,15 @@ int process_hits_tree_draw(const char *fnlist = 0, const char *commentstr = 0)
       int det = det_id - 4000;
       lhist->FillHistW("gammamon_hit_edep", det, e_dep, ev_weight);
     }
+    */
 
   } // tree loop
     
  //*********************To draw histos
-  lhist->DrawHist1D_BT15("tracking_planes_hits_x");
-
-  lhist->DrawHist1D_BT15("ecal_hits_edep");
-  lhist->DrawHist2D_BT15("ecal_hits_xy", "ecal_hits_xy", "x (mm)", "y (mm)", "N", "colz");
-
-//   lhist->DrawHist1D_BT15("lyso_hits_edep");
-
+//  lhist->DrawHist1D_BT15("tracking_planes_track_x");
+ 
+//   lhist->DrawHist2D_BT15("tracking_planes_track_xy");
+  if(debugl)std::cout << "After the loop. Adding to TFile" << std::endl;
   std::string suffix("_hits");
   std::string foutname = fnamelist.substr(fnamelist.find_last_of("/")+1);
   foutname = foutname.substr(0, foutname.find_last_of("."));
@@ -192,7 +196,8 @@ void CreateHistograms(MHists *mh)
   mh->AddHists("tracking_planes_hits_y", ndet, npixy, 0.0, npixy);
   mh->AddHists("tracking_planes_hits_xy", ndet, npixx, 0.0, npixx, npixy, 0.0, npixy);
   mh->AddHists("tracking_planes_hits_xy_edep", ndet, npixx, 0.0, npixx, npixy, 0.0, npixy);
-
+  
+  /*
   nlayers = 21;
   nsensor = 2;
   ndet = nsensor * nlayers;
@@ -215,9 +220,30 @@ void CreateHistograms(MHists *mh)
 
   ndet = 8;
   mh->AddHists("gammamon_hit_edep", ndet, 10000, 0.0, 10000.0);
+  */
 
 }
 
+
+
+void SetFormat(TH1  *hh) 
+{
+  hh->GetXaxis()->SetLabelOffset(0.01);
+  hh->GetXaxis()->SetLabelFont(43);
+  hh->GetXaxis()->SetLabelSize(20);
+  hh->GetXaxis()->SetTitleFont(43);
+  hh->GetXaxis()->SetTitleSize(20);
+  hh->GetXaxis()->SetTitleOffset(1.20);
+  hh->GetXaxis()->SetTitleColor(1);
+
+  hh->GetYaxis()->SetLabelOffset(0.01);
+  hh->GetYaxis()->SetLabelFont(43);
+  hh->GetYaxis()->SetLabelSize(20);
+  hh->GetYaxis()->SetTitleFont(43);
+  hh->GetYaxis()->SetTitleSize(20);
+  hh->GetYaxis()->SetTitleOffset(1.2);
+  hh->GetYaxis()->SetTitleColor(1);  
+}
 
 #endif
 

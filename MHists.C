@@ -18,6 +18,7 @@
  #include "stdlib.h"
  #include "TH1D.h"
  #include "TH2D.h"
+ #include "TH3D.h"
  #include "TCanvas.h"
  #include "TLegend.h"
  #include "TFile.h"
@@ -194,7 +195,7 @@ Int_t MHists::AddHists(const std::string hmapid, const Int_t nhists, Int_t n1, D
 
 
 Int_t MHists::AddHists(const std::string hmapid, const Int_t nhists, Int_t n1, Double_t a1, Double_t b1,  
-                                                                   Int_t n2, Double_t a2, Double_t b2)
+                                                                     Int_t n2, Double_t a2, Double_t b2)
 { // 2D
   if (nhists < 0) return 0;
   int hfail = 0;
@@ -202,6 +203,27 @@ Int_t MHists::AddHists(const std::string hmapid, const Int_t nhists, Int_t n1, D
     std::stringstream  hname("");
     hname << hmapid << "_" << ii;
     TH1 *hh = new TH2D(hname.str().c_str(), hname.str().c_str(), n1, a1, b1, n2, a2, b2);
+    if (hh) {
+      hh->SetDirectory(0);
+      hh->Sumw2();
+      fhist_map[hmapid].push_back(hh);
+    } else  { ++hfail; std::cerr << "Error:  MHists::AddHists: Problem to create histogram: " << hname.str() << ". Continue.\n"; }
+  }
+  return nhists - hfail;
+}
+
+
+
+Int_t MHists::AddHists(const std::string hmapid, const Int_t nhists, Int_t n1, Double_t a1, Double_t b1,  
+                                                                     Int_t n2, Double_t a2, Double_t b2,
+                                                                     Int_t n3, Double_t a3, Double_t b3)
+{ // 3D
+  if (nhists < 0) return 0;
+  int hfail = 0;
+  for (int ii = 0; ii < nhists; ++ii) {
+    std::stringstream  hname("");
+    hname << hmapid << "_" << ii;
+    TH1 *hh = new TH3D(hname.str().c_str(), hname.str().c_str(), n1, a1, b1, n2, a2, b2, n3, a3, b3);
     if (hh) {
       hh->SetDirectory(0);
       hh->Sumw2();
@@ -255,6 +277,18 @@ TH1* MHists::GetHist(const std::string hmapid, Int_t histid)
 }
 
 
+// TH3* MHists::GetHist(const std::string hmapid, Int_t histid, string hClass)
+// {
+//   hClass = "TH3";
+//   std::map< std::string, std::vector <TH3*> >::iterator  hitr = fhist_map.find(hmapid);
+//   if ( hitr != fhist_map.end() ) {
+//     if (histid >= 0 && hitr->second.size() > static_cast<unsigned int>(histid))
+//       return hitr->second[histid];
+//   } 
+//   return 0;  
+// }
+
+
 
 void MHists::FillHist(const std::string hmapid, Int_t histid, Double_t val) 
 { 
@@ -266,6 +300,15 @@ void MHists::FillHist(const std::string hmapid, Int_t histid, Double_t val)
   } else  std::cerr << "Error:  MHists::FillHist: Histogram: " << hmapid << "[" << histid << "] not found. Continue.\n";
 }
 
+void MHists::SetBinHist(const std::string hmapid, Int_t histid, Int_t binVal, Double_t val) 
+{ 
+  TH1 *hh = GetHist(hmapid, histid);
+  if (hh) { 
+    std::string cln(hh->ClassName());
+    if (cln.find("TH1") != std::string::npos) hh->SetBinContent(binVal, val);
+    else  std::cerr << "Error:  MHists::FillHist: Histogram: " << hmapid << "[" << histid << "] is not 1D. Continue.\n";
+  } else  std::cerr << "Error:  MHists::FillHist: Histogram: " << hmapid << "[" << histid << "] not found. Continue.\n";
+}
 
 void MHists::FillHist(const std::string hmapid, Int_t histid, Double_t val1, Double_t val2)
 { 
@@ -297,6 +340,17 @@ void MHists::FillHistW(const std::string hmapid, Int_t histid, Double_t val1, Do
     std::string cln(hh->ClassName());
     if (cln.find("TH2") != std::string::npos) dynamic_cast<TH2*>(hh)->Fill(val1, val2, weight);
     else  std::cerr << "Error:  MHists::FillHist: Histogram: " << hmapid << "[" << histid << "] is not 2D. Continue.\n";
+  } else  std::cerr << "Error:  MHists::FillHist: Histogram: " << hmapid << "[" << histid << "] not found. Continue.\n";
+}
+
+
+void MHists::FillHistW(const std::string hmapid, Int_t histid, Double_t val1, Double_t val2, Double_t val3, Double_t weight)
+{ 
+  TH1 *hh = GetHist(hmapid, histid);
+  if (hh) { 
+    std::string cln(hh->ClassName());
+    if (cln.find("TH3") != std::string::npos) dynamic_cast<TH3*>(hh)->Fill(val1, val2, val3, weight);
+    else  std::cerr << "Error:  MHists::FillHist: Histogram: " << hmapid << "[" << histid << "] is not 3D. Continue.\n";
   } else  std::cerr << "Error:  MHists::FillHist: Histogram: " << hmapid << "[" << histid << "] not found. Continue.\n";
 }
 
@@ -705,12 +759,26 @@ void MHists::Scale(const std::string hmapid, const Double_t x)
 }
 
 
+double MHists::Integral(const std::string hmapid)
+{ 
+  double integral = 0;
+  if (fhist_map.find(hmapid) != fhist_map.end()) {
+    for (std::vector <TH1*>::iterator itr = fhist_map[hmapid].begin(); itr != fhist_map[hmapid].end(); ++itr) {
+      TH1 *hh = dynamic_cast<TH1*>(*itr);
+      if (!hh) continue;
+      integral = hh->Integral();
+    }
+  }
+  return integral;
+}
+
+
 int MHists::SetLog (TCanvas *cc, const int axis)
 {
   TPad *pp;
   if (!cc) return 0;
   int nn = 1;
-  while ( pp = dynamic_cast<TPad*>(cc->GetPad(nn)) ) {
+  while ( (pp = dynamic_cast<TPad*>(cc->GetPad(nn))) ) {
     switch (axis) {
       case 0 : pp->SetLogx(); break;
       case 1 : pp->SetLogy(); break;
